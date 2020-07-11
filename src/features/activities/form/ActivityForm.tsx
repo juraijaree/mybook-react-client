@@ -12,13 +12,13 @@ import {
 } from 'revalidate';
 
 import { ActivityFormValues } from '../../../app/models/activity';
-import ActivityStore from '../../../app/stores/activityStore'
 import TextInput from '../../../app/common/form/TextInput';
 import TextAreaInput from '../../../app/common/form/TextAreaInput';
 import SelectInput from '../../../app/common/form/SelectInput';
 import { category } from '../../../app/common/options/categoryOptions';
 import DateInput from '../../../app/common/form/DateInput';
 import { combineDateAndTime } from '../../../app/common/utils/utils';
+import { RootStoreContext } from '../../../app/stores/rootStore';
 
 const validate = combineValidators({
   title: isRequired({ message: 'The event title is required' }),
@@ -45,7 +45,7 @@ const ActivityForm: React.FC<RouteComponentProps<DetailsParams>> = ({ match, his
     editActivity,
     submitting,
     loadActivity,
-  } = useContext(ActivityStore);
+  } = useContext(RootStoreContext).activityStore;
 
   const [activity, setActivity] = useState(new ActivityFormValues());
   const [loading, setLoading] = useState(false);
