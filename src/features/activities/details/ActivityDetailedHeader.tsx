@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Segment, Item, Header, Button, Image } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 
 import { IActivity } from '../../../app/models/activity';
+import { RootStoreContext } from '../../../app/stores/rootStore';
 
 const activityImageStyle = {
   filter: 'brightness(30%)'
@@ -20,6 +21,8 @@ const activityImageTextStyle = {
 };
 
 const ActivityDetailedHeader: React.FC<{ activity: IActivity }> = ({ activity }) => {
+  const { attendActivity, cancelAttendance, loading } = useContext(RootStoreContext).activityStore
+
   return (
     <Segment.Group>
       <Segment basic attached='top' style={{ padding: '0' }}>
@@ -45,16 +48,35 @@ const ActivityDetailedHeader: React.FC<{ activity: IActivity }> = ({ activity })
       </Segment>
 
       <Segment clearing attached='bottom'>
-        <Button color='teal'>Join Activity</Button>
-        <Button>Cancel attendance</Button>
-        <Button
-          as={Link}
-          to={`/edit-activity/${activity.id}`}
-          color='orange'
-          floated='right'
-        >
-          Manage Event
-        </Button>
+        {
+          activity.isHost ? (
+            <Button
+              as={Link}
+              to={`/edit-activity/${activity.id}`}
+              color='orange'
+              floated='right'
+            >
+              Manage Event
+            </Button>
+          ) : (
+            activity.isGoing ? (
+              <Button
+                loading={loading}
+                onClick={cancelAttendance}
+              >
+                Cancel attendance
+              </Button>
+            ) : (
+              <Button
+                loading={loading}
+                color='teal'
+                onClick={attendActivity}
+              >
+                Join Activity
+              </Button>
+            )
+          )
+        }
       </Segment>
     </Segment.Group>
   )
