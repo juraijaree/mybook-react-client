@@ -16,6 +16,7 @@ import NotFound from './NotFound';
 import { RootStoreContext } from '../stores/rootStore';
 import LoadingComponent from './LoadingComponent';
 import ModalContainer from '../common/modals/ModalContainer';
+import ProfilePage from '../../features/profiles/ProfilePage';
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -56,6 +57,7 @@ const App: React.FC = () => {
                   component={ActivityForm}
                 />
                 <Route path='/login' component={LoginForm} />
+                <Route path='/profile/:username' component={ProfilePage} />
 
                 <Route component={NotFound} />
               </Switch>
