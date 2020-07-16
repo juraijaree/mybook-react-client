@@ -1,7 +1,27 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext, useEffect } from 'react';
 import { Segment, Header, Form, Button, Comment } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
+import { Form as FinalForm, Field } from 'react-final-form';
+import { observer } from 'mobx-react-lite';
+import { formatDistance } from 'date-fns';
+
+import { RootStoreContext } from '../../../app/stores/rootStore';
+import TextAreaInput from '../../../app/common/form/TextAreaInput';
 
 const ActivityDetailedChat = () => {
+  const {
+    createHubConnection,
+    stopHubConnection,
+    addComment,
+    activity
+  } = useContext(RootStoreContext).activityStore;
+
+  useEffect(() => {
+    createHubConnection(activity!.id);
+
+    return stopHubConnection;
+  }, [createHubConnection, stopHubConnection, activity])
+
   return (
     <Fragment>
       <Segment
@@ -15,47 +35,49 @@ const ActivityDetailedChat = () => {
       </Segment>
       <Segment attached>
         <Comment.Group>
-          <Comment>
-            <Comment.Avatar src='/assets/user.png' />
-            <Comment.Content>
-              <Comment.Author as='a'>Matt</Comment.Author>
-              <Comment.Metadata>
-                <div>Today at 5:42PM</div>
-              </Comment.Metadata>
-              <Comment.Text>How artistic!</Comment.Text>
-              <Comment.Actions>
-                <Comment.Action>Reply</Comment.Action>
-              </Comment.Actions>
-            </Comment.Content>
-          </Comment>
+          {
+            activity?.comments.map(({ id, body, image, username, displayName, createdAt }) => (
+              <Comment key={id}>
+                <Comment.Avatar src={image || '/assets/user.png'} />
+                <Comment.Content>
+                  <Comment.Author as={Link} to={`/profile/${username}`}>
+                    {displayName}
+                  </Comment.Author>
 
-          <Comment>
-            <Comment.Avatar src='/assets/user.png' />
-            <Comment.Content>
-              <Comment.Author as='a'>Joe Henderson</Comment.Author>
-              <Comment.Metadata>
-                <div>5 days ago</div>
-              </Comment.Metadata>
-              <Comment.Text>Dude, this is awesome. Thanks so much</Comment.Text>
-              <Comment.Actions>
-                <Comment.Action>Reply</Comment.Action>
-              </Comment.Actions>
-            </Comment.Content>
-          </Comment>
+                  <Comment.Metadata>
+                    <div>{formatDistance(createdAt, new Date())}</div>
+                  </Comment.Metadata>
 
-          <Form reply>
-            <Form.TextArea />
-            <Button
-              content='Add Reply'
-              labelPosition='left'
-              icon='edit'
-              primary
-            />
-          </Form>
+                  <Comment.Text>{body}</Comment.Text>
+                </Comment.Content>
+              </Comment>
+            ))
+          }
+
+          <FinalForm
+            onSubmit={addComment}
+            render={({ handleSubmit, submitting, form }) => (
+              <Form onSubmit={() => handleSubmit()!.then(() => form.reset())}>
+                <Field
+                  name='body'
+                  component={TextAreaInput}
+                  rows={2}
+                  placeholder='Add your comment'
+                />
+                <Button
+                  loading={submitting}
+                  content='Add Reply'
+                  labelPosition='left'
+                  icon='edit'
+                  primary
+                />
+              </Form>
+            )}
+          />
         </Comment.Group>
       </Segment>
     </Fragment>
   )
 }
 
-export default ActivityDetailedChat
+export default observer(ActivityDetailedChat);
