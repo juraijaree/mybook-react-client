@@ -17,7 +17,12 @@ const ProfilePage: React.FC<IProps> = ({ match }) => {
   const {
     loadingProfile,
     profile,
-    loadProfile
+    loadProfile,
+    follow,
+    unfollow,
+    isCurrentUser,
+    loading,
+    setActiveTab
   } = useContext(RootStoreContext).profileStore;
 
   useEffect(() => {
@@ -29,8 +34,14 @@ const ProfilePage: React.FC<IProps> = ({ match }) => {
   return (
     <Grid>
       <Grid.Column width={16}>
-        <ProfileHeader profile={profile!} />
-        <ProfileContent />
+        <ProfileHeader
+          profile={profile!}
+          follow={follow}
+          unfollow={unfollow}
+          isCurrentUser={isCurrentUser}
+          loading={loading}
+        />
+        <ProfileContent setActiveTab={setActiveTab} />
       </Grid.Column>
     </Grid>
   )
